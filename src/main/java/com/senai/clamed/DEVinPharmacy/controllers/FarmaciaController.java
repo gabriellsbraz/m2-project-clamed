@@ -44,10 +44,10 @@ public class FarmaciaController {
     }
 
     @PutMapping("/farmacia/{cnpj}")
-    public ResponseEntity<Object> updateProduct(@PathVariable Long cnpj, @RequestBody @Valid FarmaciaRecordDto farmaciaRecordDto) {
+    public ResponseEntity<Object> updateFarmacia(@PathVariable Long cnpj, @RequestBody @Valid FarmaciaRecordDto farmaciaRecordDto) {
         Optional<FarmaciaModel> optionalFarmacia = farmaciaRepository.findById(cnpj);
         if(optionalFarmacia.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Farmacia not found.");
         }
         var farmaciaModel = optionalFarmacia.get();
         BeanUtils.copyProperties(farmaciaRecordDto, farmaciaModel);
@@ -58,10 +58,10 @@ public class FarmaciaController {
     public ResponseEntity<Object> deleteFarmacia(@PathVariable Long cnpj) {
         Optional<FarmaciaModel> optionalFarmacia = farmaciaRepository.findById(cnpj);
         if(optionalFarmacia.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Farmacia not found.");
         }
         farmaciaRepository.delete(optionalFarmacia.get());
-        return ResponseEntity.status(HttpStatus.OK).body("Product deleted succesfully.");
+        return ResponseEntity.status(HttpStatus.OK).body("Farmacia deleted succesfully.");
     }
 
 
