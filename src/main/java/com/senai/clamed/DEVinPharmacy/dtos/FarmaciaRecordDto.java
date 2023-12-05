@@ -10,13 +10,5 @@ public record FarmaciaRecordDto
          @NotBlank String email,
          String telefone,
          @NotBlank String celular,
-         @NotNull Long cep,
-         @NotBlank String logradouro,
-         @NotNull Integer numero,
-         @NotBlank String bairro,
-         @NotBlank String cidade,
-         @NotBlank String estado,
-         String complemento,
-         @NotNull Double latitude,
-         @NotNull Double longitude) {
+         EnderecoRecordDto endereco) {
 }
