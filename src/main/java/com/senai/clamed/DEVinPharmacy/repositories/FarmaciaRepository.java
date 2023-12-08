@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface FarmaciaRepository extends JpaRepository<FarmaciaModel, Long> {
+
 }

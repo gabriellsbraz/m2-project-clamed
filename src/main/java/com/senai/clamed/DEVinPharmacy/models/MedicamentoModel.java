@@ -2,9 +2,18 @@ package com.senai.clamed.DEVinPharmacy.models;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.Set;
 
 @Entity
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "TB_MEDICAMENTO")
 public class MedicamentoModel {
 
@@ -17,59 +26,4 @@ public class MedicamentoModel {
     private Float preco;
     private TipoMedicamento tipoMedicamento;
 
-    public Integer getnRegistro() {
-        return nRegistro;
-    }
-
-    public void setnRegistro(Integer nRegistro) {
-        this.nRegistro = nRegistro;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public String getLab() {
-        return lab;
-    }
-
-    public void setLab(String lab) {
-        this.lab = lab;
-    }
-
-    public String getDosagem() {
-        return dosagem;
-    }
-
-    public void setDosagem(String dosagem) {
-        this.dosagem = dosagem;
-    }
-
-    public String getDescricao() {
-        return descricao;
-    }
-
-    public void setDescricao(String descricao) {
-        this.descricao = descricao;
-    }
-
-    public Float getPreco() {
-        return preco;
-    }
-
-    public void setPreco(Float preco) {
-        this.preco = preco;
-    }
-
-    public TipoMedicamento getTipoMedicamento() {
-        return tipoMedicamento;
-    }
-
-    public void setTipoMedicamento(TipoMedicamento tipoMedicamento) {
-        this.tipoMedicamento = tipoMedicamento;
-    }
 }

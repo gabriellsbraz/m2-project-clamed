@@ -23,21 +23,15 @@ public class FarmaciaController {
     @Autowired
     private FarmaciaRepository farmaciaRepository;
 
-//    @PostMapping("/farmacia")
-//    public ResponseEntity<FarmaciaModel> saveFarmacia(@RequestBody @Valid FarmaciaRecordDto farmaciaRecordDto) {
-//        var farmaciaModel = new FarmaciaModel();
-//        BeanUtils.copyProperties(farmaciaRecordDto, farmaciaModel);
-//        return ResponseEntity.status(HttpStatus.CREATED).body(farmaciaRepository.save(farmaciaModel));
-//    }
-@PostMapping("/farmacia")
-public ResponseEntity<FarmaciaModel> saveFarmacia(@RequestBody @Valid FarmaciaRecordDto farmaciaRecordDto) {
-    var farmaciaModel = new FarmaciaModel();
-    BeanUtils.copyProperties(farmaciaRecordDto, farmaciaModel);
-    EnderecoModel enderecoModel = new EnderecoModel();
-    BeanUtils.copyProperties(farmaciaRecordDto.endereco(), enderecoModel);
-    farmaciaModel.setEndereco(enderecoModel);
-    return ResponseEntity.status(HttpStatus.CREATED).body(farmaciaRepository.save(farmaciaModel));
-}
+    @PostMapping("/farmacia")
+    public ResponseEntity<FarmaciaModel> saveFarmacia(@RequestBody @Valid FarmaciaRecordDto farmaciaRecordDto) {
+        var farmaciaModel = new FarmaciaModel();
+        BeanUtils.copyProperties(farmaciaRecordDto, farmaciaModel);
+        EnderecoModel enderecoModel = new EnderecoModel();
+        BeanUtils.copyProperties(farmaciaRecordDto.endereco(), enderecoModel);
+        farmaciaModel.setEndereco(enderecoModel);
+        return ResponseEntity.status(HttpStatus.CREATED).body(farmaciaRepository.save(farmaciaModel));
+    }
 
     @GetMapping("/farmacia")
     public ResponseEntity<List<FarmaciaModel>> getAllFarmacia(){
