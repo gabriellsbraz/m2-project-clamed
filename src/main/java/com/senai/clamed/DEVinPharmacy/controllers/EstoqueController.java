@@ -1,67 +1,63 @@
 package com.senai.clamed.DEVinPharmacy.controllers;
 
+import com.senai.clamed.DEVinPharmacy.dtos.EstoqueOutputDto;
 import com.senai.clamed.DEVinPharmacy.dtos.EstoqueRecordDto;
-import com.senai.clamed.DEVinPharmacy.models.EstoqueId;
+import com.senai.clamed.DEVinPharmacy.dtos.EstoqueTrocaMedicamentoDto;
 import com.senai.clamed.DEVinPharmacy.models.EstoqueModel;
-import com.senai.clamed.DEVinPharmacy.repositories.EstoqueRepository;
+import com.senai.clamed.DEVinPharmacy.services.EstoqueService;
 import jakarta.validation.Valid;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 public class EstoqueController {
-    @Autowired
-    private EstoqueRepository estoqueRepository;
 
+    @Autowired
+    private EstoqueService estoqueService;
 
     @PostMapping("/estoque")
-    public ResponseEntity<EstoqueModel> saveEstoque(@RequestBody @Valid EstoqueRecordDto estoqueRecordDto) {
-        var estoqueModel = new EstoqueModel();
-        BeanUtils.copyProperties(estoqueRecordDto, estoqueModel);
-        return ResponseEntity.status(HttpStatus.CREATED).body(estoqueRepository.save(estoqueModel));
+    public ResponseEntity<Object> saveEstoque(@RequestBody @Valid EstoqueRecordDto estoqueRecordDto) {
+        return estoqueService.saveEstoque(estoqueRecordDto);
     }
 
+//    @GetMapping("/estoque")
+//    public ResponseEntity<List<EstoqueOutputDto>> getAllEstoque() {
+//        return estoqueService.getAllEstoque();
+//    }
     @GetMapping("/estoque")
-    public ResponseEntity<List<EstoqueModel>> getAllEstoque() {
-        return ResponseEntity.status(HttpStatus.OK).body(estoqueRepository.findAll());
+    public ResponseEntity<List<EstoqueRecordDto>> getAllEstoque() {
+        return estoqueService.getAllEstoque();
     }
 
-    @GetMapping("/estoque/{cnpj}/{nRegistro}")
-    public ResponseEntity<Object> getOneEstoque(@PathVariable Long cnpj, @PathVariable Integer nRegistro) {
-        Optional<EstoqueModel> optionalEstoque = estoqueRepository.findById(new EstoqueId(cnpj, nRegistro));
-        if (optionalEstoque.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Estoque not found.");
+
+    @GetMapping("/estoque/{cnpj}")
+    public ResponseEntity<Object> getEstoqueByFarmacia(@PathVariable Long cnpj) {
+        return estoqueService.getEstoqueByFarmacia(cnpj);
+    }
+
+
+    // OCULTAR CNPJ
+//    @PutMapping("/estoque")
+//    public ResponseEntity<Object> updateEstoque(@PathVariable Long cnpj, @PathVariable Integer nroRegistro, @RequestBody EstoqueRecordDto estoqueRecordDto) {
+//        return estoqueService.updateEstoque(cnpj, nroRegistro, estoqueRecordDto);
+//    }
+    @PutMapping("/estoque")
+    public ResponseEntity<String> trocarMedicamento(@RequestBody EstoqueTrocaMedicamentoDto record) {
+        try {
+            estoqueService.trocarMedicamento(record);
+            return ResponseEntity.ok("Troca de medicamento realizada com sucesso");
+        } catch (ChangeSetPersister.NotFoundException e) {
+            return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.status(HttpStatus.OK).body(optionalEstoque.get());
     }
 
-
-    @PutMapping("/estoque/{cnpj}/{nRegistro}")
-    public ResponseEntity<Object> updateEstoque(@PathVariable Long cnpj, @PathVariable Integer nRegistro, @RequestBody EstoqueRecordDto estoqueRecordDto) {
-        Optional<EstoqueModel> optionalEstoque = estoqueRepository.findById(new EstoqueId(cnpj, nRegistro));
-        if (optionalEstoque.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Estoque not found.");
-        }
-        var estoqueModel = optionalEstoque.get();
-        BeanUtils.copyProperties(estoqueRecordDto, estoqueModel);
-        return ResponseEntity.status(HttpStatus.OK).body(estoqueRepository.save(estoqueModel));
+    @DeleteMapping("/estoque")
+    public ResponseEntity<Object> deleteEstoque(@RequestBody @Valid EstoqueRecordDto estoqueRecordDto) {
+        return estoqueService.deleteEstoque(estoqueRecordDto);
     }
-
-
-    @DeleteMapping("/estoque/{cnpj}/{nRegistro}")
-    public ResponseEntity<Object> deleteEstoque(@PathVariable Long cnpj, @PathVariable Integer nRegistro) {
-        Optional<EstoqueModel> optionalEstoque = estoqueRepository.findById(new EstoqueId(cnpj, nRegistro));
-        if (optionalEstoque.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Estoque not found");
-        }
-        estoqueRepository.delete(optionalEstoque.get());
-        return ResponseEntity.status(HttpStatus.OK).body("Estoque deleted successfully.");
-    }
-
 }
+

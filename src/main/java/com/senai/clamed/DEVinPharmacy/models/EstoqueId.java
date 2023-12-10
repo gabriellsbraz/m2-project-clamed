@@ -9,5 +9,5 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class EstoqueId implements Serializable {
     private Long cnpj;
-    private Integer nRegistro;
+    private Integer nroRegistro;
 }

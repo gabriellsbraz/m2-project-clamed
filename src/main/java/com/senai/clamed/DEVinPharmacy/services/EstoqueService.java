@@ -2,6 +2,7 @@ package com.senai.clamed.DEVinPharmacy.services;
 
 import com.senai.clamed.DEVinPharmacy.dtos.EstoqueOutputDto;
 import com.senai.clamed.DEVinPharmacy.dtos.EstoqueRecordDto;
+import com.senai.clamed.DEVinPharmacy.dtos.EstoqueTrocaMedicamentoDto;
 import com.senai.clamed.DEVinPharmacy.models.EstoqueId;
 import com.senai.clamed.DEVinPharmacy.models.EstoqueModel;
 import com.senai.clamed.DEVinPharmacy.models.FarmaciaModel;
@@ -12,15 +13,15 @@ import com.senai.clamed.DEVinPharmacy.repositories.MedicamentoRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class EstoqueService {
@@ -57,10 +58,10 @@ public class EstoqueService {
         return ResponseEntity.status(HttpStatus.CREATED).body(estoqueOutputDto);
     }
 
-    public ResponseEntity<List<EstoqueOutputDto>> getAllEstoque() {
+    public ResponseEntity<List<EstoqueRecordDto>> getAllEstoque() {
         List<EstoqueModel> estoqueList = estoqueRepository.findAll();
-        List<EstoqueOutputDto>  estoqueOutput = estoqueList.stream().map(estoque -> new EstoqueOutputDto(estoque.getCnpj(), estoque.getNroRegistro(), estoque.getQuantidade(), estoque.getDataAtualizacao())).toList();
-        return ResponseEntity.status(HttpStatus.OK).body(estoqueOutput);
+        List<EstoqueRecordDto>  estoques = estoqueList.stream().map(estoque -> new EstoqueRecordDto(estoque.getCnpj(), estoque.getNroRegistro(), estoque.getQuantidade(), estoque.getDataAtualizacao())).toList();
+        return ResponseEntity.status(HttpStatus.OK).body(estoques);
     }
 
     public ResponseEntity<Object> getEstoqueByFarmacia(Long cnpj) {
@@ -76,15 +77,6 @@ public class EstoqueService {
         return ResponseEntity.status(HttpStatus.OK).body(estoqueOutputDtos);
     }
 
-    public ResponseEntity<Object> getOneEstoque(Long cnpj, Integer nroRegistro) {
-        Optional<EstoqueModel> optionalEstoque = estoqueRepository.findById(new EstoqueId(cnpj, nroRegistro));
-        if (optionalEstoque.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Estoque não encontrado.");
-        }
-        EstoqueModel entity = optionalEstoque.get();
-        EstoqueOutputDto dto = new EstoqueOutputDto(entity.getCnpj(), entity.getNroRegistro(), entity.getQuantidade(), entity.getDataAtualizacao());
-        return ResponseEntity.status(HttpStatus.OK).body(dto);
-    }
 
     public ResponseEntity<Object> updateEstoque(Long cnpj, Integer nroRegistro, EstoqueRecordDto estoqueRecordDto) {
         Optional<EstoqueModel> optionalEstoque = estoqueRepository.findById(new EstoqueId(cnpj, nroRegistro));
@@ -96,7 +88,34 @@ public class EstoqueService {
         return ResponseEntity.status(HttpStatus.OK).body(estoqueRepository.save(estoqueModel));
     }
 
-    public ResponseEntity<Object> updateEstoque()
+
+    public void trocarMedicamento(EstoqueTrocaMedicamentoDto record) throws ChangeSetPersister.NotFoundException {
+        Optional<EstoqueModel> optEstoqueOrigem = estoqueRepository.findByCnpjAndNroRegistro(record.cnpjOrigem(), record.nroRegistro());
+        EstoqueModel estoqueOrigem = optEstoqueOrigem.orElseThrow(() -> new IllegalArgumentException("Registro não encontrado no Estoque (Origem)"));
+        Optional<EstoqueModel> optEstoqueDestino = estoqueRepository.findByCnpjAndNroRegistro(record.cnpjDestino(), record.nroRegistro());
+        EstoqueModel estoqueDestino = optEstoqueDestino.orElseThrow(() -> new IllegalArgumentException("Registro não encontrado no Estoque (Destino)"));
+
+        if (record.quantidade() <= 0) {
+            throw new IllegalArgumentException("A quantidade deve ser um número positivo maior que zero");
+        }
+
+        estoqueOrigem.setQuantidade(estoqueOrigem.getQuantidade() - record.quantidade());
+        estoqueDestino.setQuantidade(estoqueDestino.getQuantidade() + record.quantidade());
+
+        if (estoqueOrigem.getQuantidade() < 0 || estoqueDestino.getQuantidade() < 0) {
+            throw new IllegalArgumentException("Não pode haver estoques com quantidades negativas");
+        }
+
+        List<EstoqueModel> estoques = List.of(estoqueOrigem, estoqueDestino);
+        estoques.forEach(estoque -> {
+            if (estoque.getQuantidade() > 0) {
+                estoqueRepository.save(estoque);
+            } else {
+                estoqueRepository.delete(estoque);
+            }
+        });
+
+    }
 
     public ResponseEntity<Object> deleteEstoque(EstoqueRecordDto estoqueRecordDto) {
         Optional<EstoqueModel> optionalEstoque = estoqueRepository.findById(new EstoqueId(estoqueRecordDto.cnpj(), estoqueRecordDto.nroRegistro()));
