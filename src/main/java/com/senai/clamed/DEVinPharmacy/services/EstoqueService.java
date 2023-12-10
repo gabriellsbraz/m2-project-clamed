@@ -10,7 +10,6 @@ import com.senai.clamed.DEVinPharmacy.models.MedicamentoModel;
 import com.senai.clamed.DEVinPharmacy.repositories.EstoqueRepository;
 import com.senai.clamed.DEVinPharmacy.repositories.FarmaciaRepository;
 import com.senai.clamed.DEVinPharmacy.repositories.MedicamentoRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister;
@@ -18,10 +17,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class EstoqueService {
@@ -54,13 +51,13 @@ public class EstoqueService {
         var estoqueModel = new EstoqueModel();
         BeanUtils.copyProperties(estoqueRecordDto, estoqueModel);
         estoqueModel = estoqueRepository.save(estoqueModel);
-        EstoqueOutputDto estoqueOutputDto = new EstoqueOutputDto(estoqueModel.getCnpj(),estoqueModel.getNroRegistro(),estoqueModel.getQuantidade(),estoqueModel.getDataAtualizacao());
+        EstoqueOutputDto estoqueOutputDto = new EstoqueOutputDto(estoqueModel.getCnpj(), estoqueModel.getNroRegistro(), estoqueModel.getQuantidade(), estoqueModel.getDataAtualizacao());
         return ResponseEntity.status(HttpStatus.CREATED).body(estoqueOutputDto);
     }
 
     public ResponseEntity<List<EstoqueRecordDto>> getAllEstoque() {
         List<EstoqueModel> estoqueList = estoqueRepository.findAll();
-        List<EstoqueRecordDto>  estoques = estoqueList.stream().map(estoque -> new EstoqueRecordDto(estoque.getCnpj(), estoque.getNroRegistro(), estoque.getQuantidade(), estoque.getDataAtualizacao())).toList();
+        List<EstoqueRecordDto> estoques = estoqueList.stream().map(estoque -> new EstoqueRecordDto(estoque.getCnpj(), estoque.getNroRegistro(), estoque.getQuantidade(), estoque.getDataAtualizacao())).toList();
         return ResponseEntity.status(HttpStatus.OK).body(estoques);
     }
 
@@ -126,7 +123,7 @@ public class EstoqueService {
         EstoqueModel estoqueModel = optionalEstoque.get();
         Integer quantidade = estoqueModel.getQuantidade();
         Integer quantidadeParaDeletar = estoqueRecordDto.quantidade();
-        if (quantidadeParaDeletar > quantidade){
+        if (quantidadeParaDeletar > quantidade) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Numero a deletar deve ser menor ou igual a quantidade.");
         }
 

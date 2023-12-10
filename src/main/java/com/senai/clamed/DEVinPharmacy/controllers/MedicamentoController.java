@@ -1,8 +1,14 @@
 package com.senai.clamed.DEVinPharmacy.controllers;
 
+import com.senai.clamed.DEVinPharmacy.dtos.EstoqueRecordDto;
+import com.senai.clamed.DEVinPharmacy.dtos.FarmaciaRecordDto;
 import com.senai.clamed.DEVinPharmacy.dtos.MedicamentoRecordDto;
+import com.senai.clamed.DEVinPharmacy.models.ApiError;
+import com.senai.clamed.DEVinPharmacy.models.EnderecoModel;
+import com.senai.clamed.DEVinPharmacy.models.FarmaciaModel;
 import com.senai.clamed.DEVinPharmacy.models.MedicamentoModel;
 import com.senai.clamed.DEVinPharmacy.repositories.MedicamentoRepository;
+import com.senai.clamed.DEVinPharmacy.services.MedicamentoService;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,48 +23,30 @@ import java.util.Optional;
 public class MedicamentoController {
 
     @Autowired
-    private MedicamentoRepository medicamentoRepository;
+    private MedicamentoService medicamentoService;
 
-    @PostMapping("/medicamento")
-    public ResponseEntity<MedicamentoModel> saveFarmacia(@RequestBody @Valid MedicamentoRecordDto medicamentoRecordDto) {
-        var medicamentoModel = new MedicamentoModel();
-        BeanUtils.copyProperties(medicamentoRecordDto, medicamentoModel);
-        return ResponseEntity.status(HttpStatus.CREATED).body(medicamentoRepository.save(medicamentoModel));
+    @PostMapping("/medicamentos")
+    public ResponseEntity<?> saveMedicamento(@RequestBody @Valid MedicamentoRecordDto medicamentoRecordDto) {
+        return medicamentoService.saveMedicamento(medicamentoRecordDto);
     }
 
-    @GetMapping("/medicamento")
-    public ResponseEntity<List<MedicamentoModel>> getAllMedicamento(){
-        return ResponseEntity.status(HttpStatus.OK).body(medicamentoRepository.findAll());
+    @GetMapping("/medicamentos")
+    public ResponseEntity<List<MedicamentoModel>> getAllMedicamento() {
+        return medicamentoService.getAllMedicamento();
     }
 
-    @GetMapping("/medicamento/{nRegistro}")
-    public ResponseEntity<Object> getOneMedicamento(@PathVariable Integer nRegistro) {
-        Optional<MedicamentoModel> optionalMedicamento = medicamentoRepository.findById(nRegistro);
-        if(optionalMedicamento.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Medicamento not found.");
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(optionalMedicamento.get());
+    @GetMapping("medicamentos/{nroRegistro}")
+    public ResponseEntity<Object> getOneMedicamento(@PathVariable Integer nroRegistro) {
+        return medicamentoService.getOneMedicamento(nroRegistro);
     }
 
-    @PutMapping("/medicamento/{nRegistro}")
-    public ResponseEntity<Object> updateMedicamento(@PathVariable Integer nRegistro, @RequestBody @Valid MedicamentoRecordDto medicamentoRecordDto) {
-        Optional<MedicamentoModel> optionalMedicamento = medicamentoRepository.findById(nRegistro);
-        if(optionalMedicamento.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Medicamento not found.");
-        }
-        var medicamentoModel = optionalMedicamento.get();
-        BeanUtils.copyProperties(medicamentoRecordDto, medicamentoModel);
-        return ResponseEntity.status(HttpStatus.OK).body(medicamentoRepository.save(medicamentoModel));
+    @PutMapping("medicamentos/{nroRegistro}")
+    public ResponseEntity<Object> updateMedicamento(@PathVariable Integer nroRegistro, @RequestBody @Valid MedicamentoRecordDto medicamentoRecordDto) {
+        return medicamentoService.updateMedicamento(nroRegistro, medicamentoRecordDto);
     }
 
-    @DeleteMapping("/medicamento/{nRegistro}")
-    public ResponseEntity<Object> deleteMedicamento(@PathVariable Integer nRegistro) {
-        Optional<MedicamentoModel> optionalMedicamento = medicamentoRepository.findById(nRegistro);
-        if(optionalMedicamento.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Medicamento not found.");
-        }
-        medicamentoRepository.delete(optionalMedicamento.get());
-        return ResponseEntity.status(HttpStatus.OK).body("Medicamento deleted succesfully.");
+    @DeleteMapping("medicamentos/{nroRegistro}")
+    public ResponseEntity<Object> deleteMedicamento(@PathVariable Integer nroRegistro) {
+        return medicamentoService.deleteMedicamento(nroRegistro);
     }
-
 }

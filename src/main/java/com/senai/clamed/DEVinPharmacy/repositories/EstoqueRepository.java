@@ -11,6 +11,7 @@ import java.util.Optional;
 @Repository
 public interface EstoqueRepository extends JpaRepository<EstoqueModel, EstoqueId> {
     List<EstoqueModel> findByCnpj(Long cnpj);
+
     Optional<EstoqueModel> findByCnpjAndNroRegistro(Long cnpj, Integer nroRegistro);
 
 }

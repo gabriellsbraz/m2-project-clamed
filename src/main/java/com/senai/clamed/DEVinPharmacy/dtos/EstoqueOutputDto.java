@@ -9,7 +9,6 @@ public record EstoqueOutputDto(
         @NotNull @JsonIgnore Long cnpj,
         @NotNull Integer nroRegistro,
         @NotNull Integer quantidade,
-        LocalDateTime dataAtualizacao)
-{
+        LocalDateTime dataAtualizacao) {
 
 }

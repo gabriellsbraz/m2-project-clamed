@@ -68,10 +68,10 @@ public class InicializacaoService {
             criarEstoque(farmacia2, medicamento3, 15);
             criarEstoque(farmacia2, medicamento4, 16);
             criarEstoque(farmacia2, medicamento6, 22);
-            return ResponseEntity.ok("Data initialization successful");
+            return ResponseEntity.ok("Inicialização de dados bem-sucedida.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, "Data initialization failed"));
+                    .body(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, "Falha na inicialização dos dados."));
         }
     }
 

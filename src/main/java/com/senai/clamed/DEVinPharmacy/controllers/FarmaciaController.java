@@ -1,9 +1,12 @@
 package com.senai.clamed.DEVinPharmacy.controllers;
 
 import com.senai.clamed.DEVinPharmacy.dtos.FarmaciaRecordDto;
+import com.senai.clamed.DEVinPharmacy.models.ApiError;
 import com.senai.clamed.DEVinPharmacy.models.EnderecoModel;
+import com.senai.clamed.DEVinPharmacy.models.ErrorResponse;
 import com.senai.clamed.DEVinPharmacy.models.FarmaciaModel;
 import com.senai.clamed.DEVinPharmacy.repositories.FarmaciaRepository;
+import com.senai.clamed.DEVinPharmacy.services.FarmaciaService;
 import jakarta.validation.Valid;
 import org.hibernate.engine.spi.Resolution;
 import org.springframework.beans.BeanUtils;
@@ -21,52 +24,30 @@ import java.util.UUID;
 public class FarmaciaController {
 
     @Autowired
-    private FarmaciaRepository farmaciaRepository;
+    private FarmaciaService farmaciaService;
 
     @PostMapping("/farmacia")
-    public ResponseEntity<FarmaciaModel> saveFarmacia(@RequestBody @Valid FarmaciaRecordDto farmaciaRecordDto) {
-        var farmaciaModel = new FarmaciaModel();
-        BeanUtils.copyProperties(farmaciaRecordDto, farmaciaModel);
-        EnderecoModel enderecoModel = new EnderecoModel();
-        BeanUtils.copyProperties(farmaciaRecordDto.endereco(), enderecoModel);
-        farmaciaModel.setEndereco(enderecoModel);
-        return ResponseEntity.status(HttpStatus.CREATED).body(farmaciaRepository.save(farmaciaModel));
+    public ResponseEntity<?> saveFarmacia(@RequestBody @Valid FarmaciaRecordDto farmaciaRecordDto) {
+        return farmaciaService.saveFarmacia(farmaciaRecordDto);
     }
 
-    @GetMapping("/farmacia")
-    public ResponseEntity<List<FarmaciaModel>> getAllFarmacia(){
-        return ResponseEntity.status(HttpStatus.OK).body(farmaciaRepository.findAll());
+    @GetMapping("/farmacias")
+    public ResponseEntity<List<FarmaciaModel>> getAllFarmacia() {
+        return farmaciaService.getAllFarmacia();
     }
 
-    @GetMapping("/farmacia/{cnpj}")
+    @GetMapping("/farmacias/{cnpj}")
     public ResponseEntity<Object> getOneFarmacia(@PathVariable Long cnpj) {
-        Optional<FarmaciaModel> optionalFarmacia = farmaciaRepository.findById(cnpj);
-        if(optionalFarmacia.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Farmacia not found.");
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(optionalFarmacia.get());
+        return farmaciaService.getOneFarmacia(cnpj);
     }
 
-    @PutMapping("/farmacia/{cnpj}")
-    public ResponseEntity<Object> updateFarmacia(@PathVariable Long cnpj, @RequestBody @Valid FarmaciaRecordDto farmaciaRecordDto) {
-        Optional<FarmaciaModel> optionalFarmacia = farmaciaRepository.findById(cnpj);
-        if(optionalFarmacia.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Farmacia not found.");
-        }
-        var farmaciaModel = optionalFarmacia.get();
-        BeanUtils.copyProperties(farmaciaRecordDto, farmaciaModel);
-        return ResponseEntity.status(HttpStatus.OK).body(farmaciaRepository.save(farmaciaModel));
+    @PutMapping("/farmacias/{cnpj}")
+    public ResponseEntity<?> updateFarmacia(@PathVariable Long cnpj, @RequestBody @Valid FarmaciaRecordDto farmaciaRecordDto) {
+        return farmaciaService.updateFarmacia(cnpj, farmaciaRecordDto);
     }
 
-    @DeleteMapping("/farmacia/{cnpj}")
+    @DeleteMapping("/farmacias/{cnpj}")
     public ResponseEntity<Object> deleteFarmacia(@PathVariable Long cnpj) {
-        Optional<FarmaciaModel> optionalFarmacia = farmaciaRepository.findById(cnpj);
-        if(optionalFarmacia.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Farmacia not found.");
-        }
-        farmaciaRepository.delete(optionalFarmacia.get());
-        return ResponseEntity.status(HttpStatus.OK).body("Farmacia deleted succesfully.");
+        return farmaciaService.deleteFarmacia(cnpj);
     }
-
-
 }

@@ -2,13 +2,10 @@ package com.senai.clamed.DEVinPharmacy.models;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.Set;
 
 @Entity
 @Data
@@ -18,9 +15,9 @@ import java.util.Set;
 public class MedicamentoModel {
 
     @Id
-    private Integer nRegistro;
+    private Integer nroRegistro;
     private String nome;
-    private String lab;
+    private String laboratorio;
     private String dosagem;
     private String descricao;
     private Float preco;

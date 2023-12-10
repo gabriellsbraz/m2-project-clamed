@@ -27,7 +27,7 @@ public class FarmaciaService {
 
         Optional<FarmaciaModel> existeFarmacia = farmaciaRepository.findById(farmaciaRecordDto.cnpj());
         if (existeFarmacia.isPresent()) {
-            ErrorResponse errorResponse = new ErrorResponse("CNPJ already registered");
+            ErrorResponse errorResponse = new ErrorResponse("CNPJ ja registrado.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
 
@@ -53,10 +53,11 @@ public class FarmaciaService {
         return optionalFarmacia.map(farmaciaModel ->
                         ResponseEntity.status(HttpStatus.OK).body((Object) farmaciaModel))
                 .orElseGet(() -> {
-                    ErrorResponse errorResponse = new ErrorResponse("Farmacia not found");
+                    ErrorResponse errorResponse = new ErrorResponse("Farmacia não encontrada.");
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).body((Object) errorResponse);
                 });
     }
+
     public ResponseEntity<?> updateFarmacia(Long cnpj, FarmaciaRecordDto farmaciaRecordDto) {
         ResponseEntity<?> validationResult = validateUpdateFarmacia(farmaciaRecordDto);
         if (validationResult != null) {
@@ -69,7 +70,7 @@ public class FarmaciaService {
             BeanUtils.copyProperties(farmaciaRecordDto, farmaciaModel);
             return ResponseEntity.status(HttpStatus.OK).body(farmaciaRepository.save(farmaciaModel));
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("Farmacia not found"));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("Farmacia não encontrada."));
         }
     }
 
@@ -77,9 +78,9 @@ public class FarmaciaService {
         Optional<FarmaciaModel> optionalFarmacia = farmaciaRepository.findById(cnpj);
         if (optionalFarmacia.isPresent()) {
             farmaciaRepository.delete(optionalFarmacia.get());
-            return ResponseEntity.status(HttpStatus.OK).body("Farmacia deleted successfully.");
+            return ResponseEntity.status(HttpStatus.OK).body("Farmacia deletada com sucesso.");
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("Farmacia not found"));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("Farmacia não encontrada."));
         }
     }
 

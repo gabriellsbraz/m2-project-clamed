@@ -1,9 +1,7 @@
 package com.senai.clamed.DEVinPharmacy.services;
 
 import com.senai.clamed.DEVinPharmacy.dtos.MedicamentoRecordDto;
-import com.senai.clamed.DEVinPharmacy.models.ApiError;
 import com.senai.clamed.DEVinPharmacy.models.ErrorResponse;
-import com.senai.clamed.DEVinPharmacy.models.FarmaciaModel;
 import com.senai.clamed.DEVinPharmacy.models.MedicamentoModel;
 import com.senai.clamed.DEVinPharmacy.repositories.MedicamentoRepository;
 import org.springframework.beans.BeanUtils;
@@ -24,7 +22,7 @@ public class MedicamentoService {
     public ResponseEntity<?> saveMedicamento(MedicamentoRecordDto medicamentoRecordDto) {
         Optional<MedicamentoModel> existeMedicamento = medicamentoRepository.findById(medicamentoRecordDto.nroRegistro());
         if (existeMedicamento.isPresent()) {
-            ErrorResponse errorResponse = new ErrorResponse("nroRegistro already registered");
+            ErrorResponse errorResponse = new ErrorResponse("nroRegistro ja registrado.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
 
@@ -43,13 +41,13 @@ public class MedicamentoService {
         Optional<MedicamentoModel> optionalMedicamento = medicamentoRepository.findById(nroRegistro);
         return optionalMedicamento.map(medicamentoModel ->
                         ResponseEntity.status(HttpStatus.OK).body((Object) medicamentoModel))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Medicamento not found."));
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Medicamento não encontrado."));
     }
 
     public ResponseEntity<Object> updateMedicamento(Integer nroRegistro, MedicamentoRecordDto medicamentoRecordDto) {
         Optional<MedicamentoModel> optionalMedicamento = medicamentoRepository.findById(nroRegistro);
         if (optionalMedicamento.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Medicamento not found.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Medicamento não encontrado.");
         }
 
         var medicamentoModel = optionalMedicamento.get();
@@ -61,11 +59,11 @@ public class MedicamentoService {
     public ResponseEntity<Object> deleteMedicamento(Integer nroRegistro) {
         Optional<MedicamentoModel> optionalMedicamento = medicamentoRepository.findById(nroRegistro);
         if (optionalMedicamento.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Medicamento not found.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Medicamento não encontrado.");
         }
 
         medicamentoRepository.delete(optionalMedicamento.get());
-        return ResponseEntity.status(HttpStatus.OK).body("Medicamento deleted successfully.");
+        return ResponseEntity.status(HttpStatus.OK).body("Medicamento deletado com sucesso.");
     }
 }
 
