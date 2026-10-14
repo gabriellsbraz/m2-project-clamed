@@ -20,7 +20,7 @@ Before starting 🏁, you need to have Java installed on your machine, some API 
  Clone this project 
 $ git clone https://github.com/gabriellsbraz/m2-project-clamed
 #
- Configure the database in the application.properties or application.yml file
+ Configure the database URL and username in src/main/resources/application.properties. The password is read from the DB_PASSWORD environment variable, so set it before running: export DB_PASSWORD=your_password (Linux/macOS) or set DB_PASSWORD=your_password (Windows)
 #
  The server will initialize in the http://localhost:5432/pharmacy-api
 #
